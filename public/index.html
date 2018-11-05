@@ -1,0 +1,79 @@
+<html>
+<head>
+
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+
+</head>
+<body>
+<div id="main"></div>
+
+<script type="text/babel" data-presets="es2015, react, stage-2">
+  const NotesComponent = ({onAdd, onRemove, notes}) => (
+    <div>
+      <h1>Notes</h1>
+        <ul>
+          {notes.map(n=><li key={n.id}>{n.value}<button onClick={(e) => {onRemove(n.value)}}>X</button></li>)}
+        </ul>
+      <input type="text" id="newNote"/>
+      <button onClick={()=>onAdd(document.getElementById('newNote').value)}>Add note</button>
+    </div>
+  );
+
+  class RootComponent extends React.Component {
+    constructor(props) {
+      super(props);
+
+      this.state = {
+        notes: []
+      };
+    }
+
+    componentWillMount(){
+      this.findNotes().then(notes => {
+        // console.debug(notes);
+        this.setState({notes});
+      });
+    }
+
+    findNotes(){
+        return fetch('/api/notes').then(r=>r.json());
+    }
+
+    static addNote(note){
+      return fetch(
+        '/api/note',
+        {
+          method: 'POST',
+          body: JSON.stringify({note: note})
+        }
+      );
+    }
+
+    render() {
+      return <NotesComponent
+        notes={this.state.notes}
+        onAdd={(value) => {
+          RootComponent.addNote(value).then(()=>{
+            this.findNotes();
+          });
+        }}
+        onRemove={(value) => {
+          this.setState({
+            notes: this.state.notes.filter(n=>n.value!==value)
+          });
+        }}
+      />;
+    }
+  }
+
+  ReactDOM.render(
+    <RootComponent/>,
+    document.getElementById('main')
+  );
+</script>
+
+</body>
+</html>
+
