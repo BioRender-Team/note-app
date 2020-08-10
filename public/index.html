@@ -38,6 +38,7 @@
         async componentWillMount() {
             const notes = await this.findNotes()
             this.setState({notes});
+
         }
 
         async findNotes() {
@@ -58,8 +59,8 @@
             return <NotesComponent
                 notes={this.state.notes}
                 onAdd={(value) => {
-                    RootComponent.addNote(value).then(async () => {
-                        await this.findNotes();
+                    RootComponent.addNote(value).then(() => {
+                        this.findNotes();
                     });
                 }}
                 onRemove={(value) => {
