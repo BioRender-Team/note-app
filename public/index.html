@@ -26,25 +26,19 @@
         </div>
     );
 
-    class RootComponent extends React.Component {
-        constructor(props) {
-            super(props);
+    const RootComponent = () => {
+        const [notes, setNotes] = React.useState([]);
 
-            this.state = {
-                notes: []
-            };
-        }
-
-        async componentWillMount() {
-            const notes = await this.findNotes()
-            this.setState({notes});
-        }
-
-        async findNotes() {
+        const findNotes = async () => {
             return await fetch('/api/notes').then(r => r.json());
         }
 
-        static addNote(note) {
+        React.useEffect(() => {
+            findNotes().then(notes => setNotes(notes))
+        }, [])
+
+
+        const addNote = (note) => {
             return fetch(
                 '/api/note',
                 {
@@ -54,21 +48,17 @@
             );
         }
 
-        render() {
-            return <NotesComponent
-                notes={this.state.notes}
-                onAdd={(value) => {
-                    RootComponent.addNote(value).then(async () => {
-                        await this.findNotes();
-                    });
-                }}
-                onRemove={(value) => {
-                    this.setState({
-                        notes: this.state.notes.filter(n => n.value !== value)
-                    });
-                }}
-            />;
-        }
+        return <NotesComponent
+            notes={notes}
+            onAdd={(value) => {
+                addNote(value).then(() => {
+                    findNotes();
+                });
+            }}
+            onRemove={(value) => {
+                setNotes(notes.filter(n => n.value !== value));
+            }}
+        />;
     }
 
     ReactDOM.render(
@@ -79,4 +69,3 @@
 
 </body>
 </html>
-
