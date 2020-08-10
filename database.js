@@ -1,5 +1,6 @@
 import * as sqlite from 'sqlite3';
 
+// Create an in-memory database and prepopulate it with first three sample notes
 const db = new sqlite.Database(':memory:');
 
 db.serialize(function () {
@@ -17,8 +18,8 @@ export function readNotes() {
   });
 }
 
-export function writeNote(message) {
-  db.run(`INSERT INTO notes VALUES (null, '${message}')`);
+export async function writeNote(message) {
+  return await db.run(`INSERT INTO notes VALUES (null, '${message}')`);
 }
 
 
