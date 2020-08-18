@@ -18,18 +18,6 @@ export async function readNotes() {
     });
 }
 
-const insertNote = async () => {
-    return await new Promise(resolve => {
-        db.run(`INSERT INTO notes VALUES (null, '${message}')`, function () {
-            db.all(`SELECT * FROM notes WHERE id = ${this.lastID}`, (err, result) => {
-                if (result && result.length === 1) {
-                    resolve(result[0])
-                }
-            });
-        });
-    });
-}
-
 export async function writeNote(message) {
     return await new Promise(resolve => {
         db.run(`INSERT INTO notes VALUES (null, '${message}')`, function () {
