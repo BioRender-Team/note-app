@@ -19,9 +19,6 @@
                         onRemove(n.value)
                     }}>X
                     </button>
-                    <button onClick={(e) => {
-                    }}>Edit note
-                    </button>
                 </li>)}
             </ul>
             <input type="text" id="newNote"/>
@@ -40,26 +37,42 @@
             findNotes().then(notes => setNotes(notes))
         }, [])
 
+        const removeNote = (note) => {
+            return fetch(
+                '/api/note',
+                {
+                    method: 'DELETE',
+                    body: JSON.stringify({note}),
+                    headers: {
+                        "content-type": "application/json"
+                    }
+                }
+            );
+        }
 
         const addNote = (note) => {
             return fetch(
                 '/api/note',
                 {
                     method: 'POST',
-                    body: JSON.stringify({note: note})
+                    body: JSON.stringify({note}),
+                    headers: {
+                        "content-type": "application/json"
+                    }
                 }
-            );
+            ).then(r => r.json());
         }
 
         return <NotesComponent
             notes={notes}
-            onAdd={(value) => {
-                addNote(value).then(() => {
-                    findNotes();
-                });
+            onAdd={async (value) => {
+                const newNote = await addNote(value);
+                console.log(newNote)
+                setNotes([...notes, newNote])
             }}
-            onRemove={(value) => {
-                setNotes(notes.filter(n => n.value !== value));
+            onRemove={async (value) => {
+                await removeNote(value);
+                setNotes([...notes.filter(n => n.value !== value)]);
             }}
         />;
     }
