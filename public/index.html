@@ -10,23 +10,31 @@
 <div id="main"></div>
 
 <script type="text/babel" data-presets="es2015, react, stage-2">
-    const NotesComponent = ({onAdd, onRemove, notes}) => (
-        <div>
-            <h1>Notes</h1>
-            <ul>
-                {notes.map(n => <li key={n.id}>{n.value}
-                    <button onClick={(e) => {
-                        onRemove(n.value)
-                    }}>X
-                    </button>
-                </li>)}
-            </ul>
-            <input type="text" id="newNote"/>
-            <button onClick={() => onAdd(document.getElementById('newNote').value)}>Add note</button>
-        </div>
-    );
+    const NotesList = ({onAdd, onRemove, notes}) => {
+        return (
+            <div>
+                <h1>Notes</h1>
+                <ul>
+                    {notes.map(n => (
+                        <li key={n.id}>
+                            {n.value}
+                            <button
+                                onClick={(e) => {
+                                    onRemove(n.value)
+                                }}
+                            >
+                                X
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+                <input type="text" id="newNote"/>
+                <button onClick={() => onAdd(document.getElementById('newNote').value)}>Add note</button>
+            </div>
+        );
+    }
 
-    const RootComponent = () => {
+    const Root = () => {
         const [notes, setNotes] = React.useState([]);
 
         const findNotes = async () => {
@@ -34,12 +42,14 @@
         }
 
         React.useEffect(() => {
-            findNotes().then(notes => setNotes(notes))
-        }, [])
+            (async () => {
+                setNotes(await findNotes());
+            })();
+        }, []);
 
 
-        const addNote = (note) => {
-            return fetch(
+        const addNote = async (note) => {
+            await fetch(
                 '/api/note',
                 {
                     method: 'POST',
@@ -48,21 +58,22 @@
             );
         }
 
-        return <NotesComponent
-            notes={notes}
-            onAdd={(value) => {
-                addNote(value).then(() => {
-                    findNotes();
-                });
-            }}
-            onRemove={(value) => {
-                setNotes(notes.filter(n => n.value !== value));
-            }}
-        />;
+        return (
+            <NotesList
+                notes={notes}
+                onAdd={async (value) => {
+                    await addNote(value);
+                    await findNotes();
+                }}
+                onRemove={(value) => {
+                    setNotes(notes.filter(n => n.value !== value));
+                }}
+            />
+        );
     }
 
     ReactDOM.render(
-        <RootComponent/>,
+        <Root />,
         document.getElementById('main')
     );
 </script>
