@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
+    "cypress": "^6.2.1",
     "express": "^4.16.4",
     "jsxdirect": "0.0.7",
     "react": "^16.6.0",
