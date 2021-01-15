@@ -19,7 +19,9 @@ function preseed() {
 }
 export function readNotes() {
   return new Promise((r) => {
-    db.all("SELECT * FROM notes", (err, result) => r(result));
+    db.all("SELECT * FROM notes", (err, result) => {
+      return r(result);
+    });
   });
 }
 
@@ -27,9 +29,8 @@ export async function writeNote(message) {
   return await db.run(`INSERT INTO notes VALUES (null, '${message}')`);
 }
 
-export function deleteNote(message) {
-  console.log(message);
-  db.run(`DELETE FROM notes WHERE value = '${message}'`);
+export function deleteNote(id) {
+  db.run(`DELETE FROM notes WHERE id = '${id}'`);
 }
 
 export function resetDB() {

@@ -17,7 +17,7 @@
                 {n.value}
                 <button
                   onClick={(e) => {
-                    onRemove(n.value);
+                    onRemove(n.id);
                   }}
                 >
                   X
@@ -27,7 +27,10 @@
           </ul>
           <input type="text" id="newNote" />
           <button
-            onClick={() => onAdd(document.getElementById("newNote").value)}
+            onClick={() => {
+              onAdd(document.getElementById("newNote").value);
+              document.getElementById("newNote").value = "";
+            }}
           >
             Add note
           </button>
@@ -43,23 +46,23 @@
           return await fetch("/api/notes").then((r) => r.json());
         };
 
-        const deleteNote = (note) => {
-          return fetch("api/note", {
+        const deleteNote = async (id) => {
+          return await fetch(`/api/note/${id}`, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ note: note }),
           });
         };
 
         React.useEffect(() => {
-          findNotes().then((notes) => setNotes(notes));
+          (async () => {
+            setNotes(await findNotes());
+          })();
         }, []);
 
         const addNote = async (note) => {
-          console.log(notes.length);
-          if (notes.length > 10) {
+          if (notes.length >= 10) {
             setMessage("Can't have more than 10 notes.");
             return;
           }
@@ -76,16 +79,18 @@
           <NotesComponent
             message={message}
             notes={notes}
-            onAdd={(value) => {
-              addNote(value);
-              findNotes().then((res) => {
-                setNotes(res);
-              });
+            onAdd={async (value) => {
+              if (value) {
+                setMessage("");
+                await addNote(value);
+                setNotes(await findNotes());
+              } else {
+                setMessage("Note can't be empty.");
+              }
             }}
-            onRemove={(value) => {
-              deleteNote(value).then(() => {
-                setNotes(notes.filter((n) => n.value !== value));
-              });
+            onRemove={async (value) => {
+              await deleteNote(value);
+              setNotes(await findNotes());
             }}
           />
         );

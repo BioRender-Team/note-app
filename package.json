@@ -19,7 +19,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --inspect ./server.js --exec babel-node --presets es2015,stage-2"
+    "start": "nodemon --inspect ./server.js --exec babel-node --presets es2015,stage-2",
+    "cy:open": "cypress open"
   },
   "author": "",
   "license": "ISC"

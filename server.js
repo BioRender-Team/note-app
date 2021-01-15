@@ -12,13 +12,16 @@ app.post("/api/note", async (req, res, next) => {
   res.send(await writeNote(req.body.note));
 });
 
-app.delete("/api/note", async (req, res, next) => {
-  console.log(req.body.note);
-  res.send(await deleteNote(req.body.note));
+app.delete("/api/note/:id", async (req, res, next) => {
+  try {
+    await deleteNote(req.params.id);
+    res.status(200).send();
+  } catch (err) {
+    res.status(400).send();
+  }
 });
 
 app.delete("/api/notes", async (req, res, next) => {
-  console.log(req.body.note);
   res.send(await resetDB());
 });
 
