@@ -10,8 +10,7 @@ Open cypress in another terminal:
 Go to http://localhost:8080
 
 Test file:
-.
-    ├── cypress                       
-    │   ├── integration             
-    │   │    ├── notes.spec.js           
-    └── ...
+```
+cypress
+├── integration
+│   └── note.spec.js
