@@ -13,4 +13,4 @@ Test file:
 ```
 cypress
 ├── integration
-│   └── note.spec.js
+│   └── notes.spec.js
