@@ -1,7 +1,16 @@
 # note-app
 
-To run the project:
-```npm install```
-```npm start```
+To run the project in one terminal:
+`npm install`
+`npm start`
 
-Go to http://localhost:8080
+Run jest:
+`npm test`
+
+Test file:
+
+```
+src
+├── __tests__
+│   └── app.test.js
+```
