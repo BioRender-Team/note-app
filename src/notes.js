@@ -16,7 +16,7 @@ export const NotesComponent = ({ onAdd, onRemove, notes, message }) => (
         </li>
       ))}
     </ul>
-    <input type="text" id="newNote" />
+    <input type="text" id="newNote" aria-label="new-note" />
     <button
       onClick={() => {
         onAdd(document.getElementById("newNote").value);

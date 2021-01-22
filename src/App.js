@@ -29,13 +29,18 @@ export const App = () => {
       setMessage("Can't have more than 10 notes.");
       return;
     }
-    await fetch("/api/note", {
+    const addedNote = await fetch("/api/note", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ note: note }),
     });
+    try {
+      await addedNote.json();
+    } catch (err) {
+      setMessage("Something goes wrong.");
+    }
   };
 
   return (
