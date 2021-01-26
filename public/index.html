@@ -48,7 +48,9 @@
             return fetch(
                 '/api/note',
                 {
-                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({note: note})
                 }
             );
