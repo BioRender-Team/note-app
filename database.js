@@ -27,3 +27,6 @@ export function deleteNote(message) {
   db.run(`DELETE FROM notes WHERE value = '${message}'`);
 }
 
+export function editNote() {
+  // 
+}

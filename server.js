@@ -18,4 +18,6 @@ app.delete('/api/note', async (req, res, next) => {
 
 app.use('*', express.static(__dirname + '/public'));
 
-app.listen(process.env.PORT || 8080);
+app.listen(process.env.PORT || 8080, () => {
+  console.log('App running on 8080 ✅');
+});
