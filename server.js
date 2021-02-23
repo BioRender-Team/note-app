@@ -5,6 +5,9 @@ const app = express();
 app.use(express.json());
 
 // Returns all note objects
+// params.text: string
+// params.date: 'asc' | 'desc'
+
 app.get('/api/notes', async (req, res, next) => {
     try {
         const notes = await readNotes()

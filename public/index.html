@@ -12,60 +12,135 @@
 <div id="main"></div>
 
 <script type="text/babel" data-presets="es2015, react, stage-2">
-    const NotesComponent = ({onAdd, onRemove, notes}) => (
-        <div>
-            <h1>Notes</h1>
-            <ul>
-                {notes.map(n => <li key={n.id}>{n.value}
-                    <button onClick={(e) => {
-                        onRemove(n.value)
-                    }}>X
-                    </button>
-                    <button onClick={(e) => {
-                    }}>Edit note
-                    </button>
-                </li>)}
-            </ul>
-            <input type="text" id="newNote"/>
-            <button onClick={() => onAdd(document.getElementById('newNote').value)}>Add note</button>
-        </div>
-    );
+
+    const NewNoteInput = ({ onAdd }) => {
+        const [newNoteText, setNewNoteText] = React.useState('');
+        const onSubmit = (e) => {
+            e.preventDefault();
+            if (!newNoteText) { return; }
+            onAdd(newNoteText)
+            setNewNoteText('');
+        }
+        return (
+            <form className="new-note-input" onSubmit={onSubmit}>
+                <input type="text" value={newNoteText} onChange={e => setNewNoteText(e.target.value)} placeholder="Add a new note" />
+                <button type="submit">ADD</button>
+            </form>
+        )
+    }
+    const NotesList = ({ onAdd, onRemove, notes }) => {
+        return (
+            <React.Fragment>
+                <ul className="notes-list">
+                    {notes.map(n => (
+                        <li key={n.id} className="note">
+                            {n.value}
+                            <button className="note-delete" onClick={(e) => onRemove(n.id)}>
+                                ×
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            </React.Fragment>
+        );
+    };
+
+    const SearchBar = ({ searchNotes, hasActiveTextSearch }) => {
+        const [text, setText] = React.useState('');
+        const [isDateDesc, setIsDateDesc] = React.useState(true);
+
+        const onSubmit = (e) => {
+            e.preventDefault();
+            searchNotes(text, isDateDesc);
+        }
+
+        const onClear = () => {
+            setText('');
+            searchNotes('', isDateDesc);
+        }
+
+        const changeSort = () => {
+            setIsDateDesc(!isDateDesc);
+            searchNotes(text, isDateDesc);
+        }
+
+        return (
+            <form className="search-bar" onSubmit={onSubmit}>
+                <button className="search-bar-sort" type="button" onClick={changeSort}>
+                    {`DATE ${isDateDesc ? 'DESC' : 'ASC'}`}
+                </button>
+                <input type="text" value={text} onChange={(e) => setText(e.target.value)} placeholder="Search notes" />
+                {hasActiveTextSearch && <button className="search-bar-clear" onClick={onClear} type="button">×</button>}
+                <button className="search-bar-submit" type="submit">SEARCH</button>
+            </form>
+        )
+    }
 
     const RootComponent = () => {
         const [notes, setNotes] = React.useState([]);
+        const [hasActiveTextSearch, setHasActiveTextSearch] = React.useState('')
 
-        const findNotes = async () => {
-            return await fetch('/api/notes').then(r => r.json());
+        const searchNotes = async (text, isDateDesc) => {
+            try {
+                setNotes(
+                    await fetch(`/api/notes?text=${text}&date=${isDateDesc ? 'desc' : 'asc'}`).then(r => r.json()),
+                );
+                setHasActiveTextSearch(text !== '');
+            } catch (e) {
+                console.error(e);
+            }
         }
 
         React.useEffect(() => {
-            findNotes().then(notes => setNotes(notes))
+            (async () => {
+                await searchNotes('', true);
+            })()
         }, [])
 
-
-        const addNote = (note) => {
-            return fetch(
+        const addNote = async (note) => {
+            const newNote = await fetch(
                 '/api/note',
                 {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({note: note})
+                    body: JSON.stringify({ note })
                 }
-            );
+            ).then(r => r.json());
+
+            setNotes([...notes, newNote]);
         }
 
-        return <NotesComponent
-            notes={notes}
-            onAdd={(value) => {
-                addNote(value).then(() => {
-                    findNotes();
-                });
-            }}
-            onRemove={(value) => {
-                setNotes(notes.filter(n => n.value !== value));
-            }}
-        />;
+        const removeNote = async (noteId) => {
+            try {
+                await fetch(
+                    `/api/note/${noteId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    }
+                );
+
+                setNotes(notes.filter(n => n.id !== noteId));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        return (
+            <div className="notes-app">
+                <h1>Notes</h1>
+                <SearchBar searchNotes={searchNotes} hasActiveTextSearch={hasActiveTextSearch} />
+                <NotesList
+                    notes={notes}
+                    onRemove={removeNote}
+                />
+                <NewNoteInput onAdd={addNote} />
+            </div>
+        );
     }
 
     ReactDOM.render(
