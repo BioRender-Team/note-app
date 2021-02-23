@@ -1,10 +1,8 @@
-# BioRender Note App: Front End (Hooks)
+# BioRender Note App: Backend (Extra)
 
-This app uses React (with hooks) on the frontend, express as its server, and sqlite as its database. Its a simple app, where users can create and delete notes.
+This app uses React (with hooks) on the frontend, express as its server, and sqlite as its database. Its a simple app, where users can create, delete, and search/sort notes.
 
-To complete this test, first find and fix all of the bugs on the front end of the application. There are a total of 3 bugs.
-
-Next, update the style of the application to match [these](https://scene.zeplin.io/project/601b083a92af6724b5a973bf) designs as closely as possible.
+Currently the backend of the search/sort functionality is missing. Add it to complete the test.
 
 Feel free to change any part of the app, from the code style to the implementation.
 
